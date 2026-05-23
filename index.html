@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no">
+  <title>Journey of the Cowboy</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <div id="title" class="screen">
+      <div class="center-box">
+        <div class="title-star">&#9733;</div>
+        <h1 class="game-title">JOURNEY OF THE<br>COWBOY</h1>
+        <p class="title-sub">A Tile-Based Frontier Shooter</p>
+        <div class="menu-list">
+          <button class="menu-btn focusable" data-action="start-game">START GAME</button>
+          <button class="menu-btn focusable" data-action="how-to-play">HOW TO PLAY</button>
+          <button class="menu-btn toggle-btn focusable" data-action="toggle-music" id="title-music-btn">MUSIC: ON</button>
+          <button class="menu-btn toggle-btn focusable" data-action="toggle-sfx" id="title-sfx-btn">SFX: ON</button>
+        </div>
+        <p class="title-hi" id="high-score"></p>
+      </div>
+    </div>
+
+    <div id="difficulty" class="screen hidden">
+      <div class="center-box">
+        <h1 class="game-title" style="font-size:24px;margin-bottom:16px;">SELECT DIFFICULTY</h1>
+        <div class="menu-list">
+          <button class="menu-btn focusable" data-action="diff-easy">EASY</button>
+          <button class="menu-btn focusable" data-action="diff-normal">NORMAL</button>
+          <button class="menu-btn focusable" data-action="diff-hard">HARD</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="howto" class="screen hidden">
+      <header class="header">
+        <button class="back-btn focusable" data-action="back">&#8592;</button>
+        <h1>HOW TO PLAY</h1>
+      </header>
+      <div class="content howto-content">
+        <div class="howto-row"><span class="howto-key">&#9650;&#9660;&#9664;&#9654;</span><span>Move 1 tile &amp; aim</span></div>
+        <div class="howto-row"><span class="howto-label">AUTO-FIRE</span><span>Shoots in facing direction</span></div>
+        <div class="howto-row"><span class="howto-key">ENTER</span><span>Use stored item</span></div>
+        <div class="howto-row"><span class="howto-key">ESC</span><span>Pause game</span></div>
+        <div class="howto-divider"></div>
+        <p class="howto-tip">Survive waves of enemies across 3 stages. Collect coins to buy upgrades at shops between areas. Defeat the boss at the end of each stage!</p>
+        <p class="howto-tip">Each hit costs one heart. Lose all hearts and it's game over!</p>
+      </div>
+    </div>
+
+    <div id="game" class="screen hidden">
+      <canvas id="gameCanvas" width="600" height="600"></canvas>
+    </div>
+
+    <div id="shop" class="screen hidden">
+      <header class="header shop-header">
+        <span class="header-meta" id="shop-lives"></span>
+        <h1>GENERAL STORE</h1>
+        <span class="header-meta" id="shop-coins"></span>
+      </header>
+      <div class="content" id="shop-items"></div>
+      <nav class="nav-bar">
+        <button class="nav-item primary focusable" data-action="exit-shop">DONE SHOPPING &#9654;</button>
+      </nav>
+    </div>
+
+    <div id="gameover" class="screen hidden">
+      <div class="center-box">
+        <div class="title-star dead">&#9760;</div>
+        <h1 class="go-title">GAME OVER</h1>
+        <p class="go-stats" id="go-stats"></p>
+        <div class="menu-list">
+          <button class="menu-btn focusable" data-action="restart">TRY AGAIN</button>
+          <button class="menu-btn focusable" data-action="go-title">QUIT</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="victory" class="screen hidden">
+      <div class="center-box">
+        <div class="title-star win">&#9733;</div>
+        <h1 class="victory-title">VICTORY!</h1>
+        <p class="victory-text">The Prairie is saved, partner!</p>
+        <p class="go-stats" id="vic-stats"></p>
+        <div class="menu-list">
+          <button class="menu-btn focusable" data-action="restart">PLAY AGAIN</button>
+          <button class="menu-btn focusable" data-action="go-title">QUIT</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

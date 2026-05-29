@@ -5,8 +5,8 @@
   var TILE = 50, GRID = 9;
   var ARENA_W = GRID * TILE;
   var ARENA_X = 75, ARENA_Y = 65;
-  var BULLET_SPEED = 6;
-  var WAVE_DUR = 30;
+  var BULLET_SPEED = 4.2;
+  var WAVE_DUR = 22;
   var INVINCE_DUR = 2;
   var INPUT_CD = 150;
   var FIRE_RATES = [500, 400, 300, 200];
@@ -21,13 +21,13 @@
   ];
 
   var ENEMY_DEFS = {
-    orc:       { hp: 1, mi: 1.0, fly: false, clr: '#2E8B57', clr2: '#1B5E36' },
-    spikeball: { hp: 2, mi: 0.6, fly: false, clr: '#909090', clr2: '#606060', deployHP: 5 },
-    ogre:      { hp: 3, mi: 1.5, fly: false, clr: '#8B6914', clr2: '#5C4510' },
-    mushroom:  { hp: 2, mi: 0.5, fly: false, clr: '#FF4C3B', clr2: '#CC2222' },
-    butterfly: { hp: 1, mi: 0.7, fly: true,  clr: '#DA70D6', clr2: '#9B30FF' },
-    mummy:     { hp: 6, mi: 2.0, fly: false, clr: '#DAA520', clr2: '#B8860B' },
-    imp:       { hp: 3, mi: 0.4, fly: true,  clr: '#DC143C', clr2: '#8B0000' },
+    orc:       { hp: 1, mi: 1.6, fly: false, clr: '#2E8B57', clr2: '#1B5E36' },
+    spikeball: { hp: 2, mi: 0.85, fly: false, clr: '#909090', clr2: '#606060', deployHP: 5 },
+    ogre:      { hp: 3, mi: 2.1, fly: false, clr: '#8B6914', clr2: '#5C4510' },
+    mushroom:  { hp: 2, mi: 0.85, fly: false, clr: '#FF4C3B', clr2: '#CC2222' },
+    butterfly: { hp: 1, mi: 1.2, fly: true,  clr: '#DA70D6', clr2: '#9B30FF' },
+    mummy:     { hp: 6, mi: 4.0, fly: false, clr: '#DAA520', clr2: '#B8860B' },
+    imp:       { hp: 3, mi: 0.85, fly: true,  clr: '#DC143C', clr2: '#8B0000' },
   };
 
   var LAYOUTS = {
@@ -55,8 +55,8 @@
     '2-2': [{t:'mushroom',w:2},{t:'butterfly',w:2},{t:'ogre',w:1}],
     '2-3': [{t:'mushroom',w:2},{t:'butterfly',w:2},{t:'ogre',w:2}],
     '3-1': [{t:'mummy',w:2},{t:'imp',w:1}],
-    '3-2': [{t:'mummy',w:2},{t:'imp',w:2},{t:'ogre',w:1}],
-    '3-3': [{t:'mummy',w:1},{t:'imp',w:3},{t:'ogre',w:1}],
+    '3-2': [{t:'mummy',w:1},{t:'imp',w:2},{t:'ogre',w:1}],
+    '3-3': [{t:'mummy',w:1},{t:'imp',w:2},{t:'ogre',w:1}],
   };
 
   var PROGRESSION = [
@@ -94,6 +94,12 @@
     easy:   { spawnMult: 1.4, bossHpMult: 0.8 },
     normal: { spawnMult: 1.0, bossHpMult: 1.0 },
     hard:   { spawnMult: 0.7, bossHpMult: 1.2 }
+  };
+
+  var BOSS_NAMES = {
+    1: 'Bandit Tex',
+    2: 'Sheriff Duke',
+    3: 'Ringleader Savannah'
   };
 
   // ============ STATE ============
@@ -169,40 +175,42 @@
   function initFileAudio() {
     musicNormal = new Audio('duel.mp3');
     musicNormal.loop = true;
-    musicNormal.volume = 0.25;
+    musicNormal.volume = 0;
     musicNormal.preload = 'auto';
 
     musicBoss = new Audio('spaghetti.mp3');
     musicBoss.loop = true;
-    musicBoss.volume = 0.25;
+    musicBoss.volume = 0;
     musicBoss.preload = 'auto';
 
     sfxFiles.complete = new Audio('complete.wav');
+    sfxFiles.complete.volume = 0.25;
     sfxFiles.complete.preload = 'auto';
     sfxFiles.gameOver = new Audio('game_over.wav');
     sfxFiles.gameOver.volume = 0.2;
     sfxFiles.gameOver.preload = 'auto';
     sfxFiles.levelWin = new Audio('level_win.wav');
+    sfxFiles.levelWin.volume = 0.2;
     sfxFiles.levelWin.preload = 'auto';
   }
 
   function playMusic() {
     if (musicMuted) return;
     currentMusic = musicNormal;
-    if (musicNormal) { musicNormal.currentTime = 0; musicNormal.play().catch(function() {}); }
+    if (musicNormal) { musicNormal.volume = 0.25; musicNormal.currentTime = 0; musicNormal.play().catch(function() {}); }
   }
 
   function playBossMusic() {
     if (musicNormal) musicNormal.pause();
     if (musicMuted) { currentMusic = musicBoss; return; }
     currentMusic = musicBoss;
-    if (musicBoss) { musicBoss.currentTime = 0; musicBoss.play().catch(function() {}); }
+    if (musicBoss) { musicBoss.volume = 0.25; musicBoss.currentTime = 0; musicBoss.play().catch(function() {}); }
   }
 
   function stopBossMusic() {
     if (musicBoss) { musicBoss.pause(); musicBoss.currentTime = 0; }
     currentMusic = musicNormal;
-    if (!musicMuted && musicNormal) musicNormal.play().catch(function() {});
+    if (!musicMuted && musicNormal) { musicNormal.volume = 0.25; musicNormal.play().catch(function() {}); }
   }
 
   function stopMusic() {
@@ -295,12 +303,11 @@
   }
 
   function tileBlocks(tile, isEnemy) {
-    if (tile === 1 || tile === 2 || tile === 4) return true;
-    if (tile === 3 && isEnemy) return true;
+    if (tile === 1 || tile === 2 || tile === 3 || tile === 4) return true;
     return false;
   }
 
-  function tileSolid(tile) { return tile === 1; }
+  function tileSolid(tile) { return tile === 1 || tile === 2 || tile === 3; }
 
   function weightedRandom(items) {
     var total = 0;
@@ -722,28 +729,28 @@
     ctx.fillRect(0, 0, 600, 58);
 
     // Lives — filled hearts + outlines for missing
-    ctx.font = 'bold 20px sans-serif';
+    ctx.font = 'bold 28px sans-serif';
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     for (var i = 0; i < game.maxLives; i++) {
       if (i < game.lives) {
         ctx.fillStyle = '#FF2244';
-        ctx.fillText('♥', 16 + i * 24, 30);
+        ctx.fillText('♥', 16 + i * 32, 30);
       } else {
         ctx.fillStyle = '#442233';
-        ctx.fillText('♡', 16 + i * 24, 30);
+        ctx.fillText('♡', 16 + i * 32, 30);
       }
     }
 
     // Stage/Area
-    ctx.fillStyle = '#FFF';
-    ctx.font = 'bold 18px sans-serif';
+    ctx.fillStyle = game.boss ? '#FF4444' : '#FFF';
+    ctx.font = 'bold 22px sans-serif';
     ctx.textAlign = 'center';
-    var label = game.boss ? 'BOSS FIGHT' : STAGE_COLORS[game.stage].name.toUpperCase() + ' ' + game.stage + '-' + game.area;
+    var label = game.boss ? (BOSS_NAMES[game.boss.type] || 'BOSS') : STAGE_COLORS[game.stage].name.toUpperCase() + ' ' + game.stage + '-' + game.area;
     ctx.fillText(label, 300, 30);
 
     // Coins
     ctx.fillStyle = '#FFD700';
-    ctx.font = 'bold 18px sans-serif';
+    ctx.font = 'bold 22px sans-serif';
     ctx.textAlign = 'right';
     ctx.fillText('◆ ' + game.coins, 584, 30);
   }
@@ -828,7 +835,7 @@
 
     // Stored item
     ctx.fillStyle = '#555';
-    ctx.font = '13px sans-serif';
+    ctx.font = 'bold 15px sans-serif';
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     ctx.fillText('ITEM:', 16, 542);
     if (game.storedItem) {
@@ -836,7 +843,7 @@
       var colors = { smoke: '#AAAAFF', nuke: '#FF3344' };
       var blocked = !!game.boss;
       ctx.fillStyle = blocked ? '#444' : (colors[game.storedItem] || '#FFF');
-      ctx.font = 'bold 14px sans-serif';
+      ctx.font = 'bold 17px sans-serif';
       ctx.fillText((labels[game.storedItem] || game.storedItem) + (blocked ? ' (N/A)' : ''), 60, 542);
     } else {
       ctx.fillStyle = '#333';
@@ -847,7 +854,7 @@
     if (game.activePower && game.powerTimer > 0) {
       var pwrNames = { shotgun:'SHOTGUN', machinegun:'RAPID', wagon:'WHEEL', sheriff:'SHERIFF' };
       ctx.fillStyle = '#FFD700';
-      ctx.font = 'bold 13px sans-serif';
+      ctx.font = 'bold 16px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(pwrNames[game.activePower] || game.activePower.toUpperCase(), 300, 542);
       // Timer bar
@@ -861,7 +868,7 @@
     // Wave progress
     if (!game.boss) {
       ctx.fillStyle = '#555';
-      ctx.font = '13px sans-serif';
+      ctx.font = 'bold 15px sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText('WAVE', 584, 542);
       ctx.fillStyle = '#222';
@@ -872,7 +879,7 @@
     }
 
     // Upgrade indicators
-    ctx.font = '11px sans-serif';
+    ctx.font = 'bold 13px sans-serif';
     ctx.fillStyle = '#444';
     ctx.textAlign = 'left';
     var ugText = '';
@@ -1177,7 +1184,7 @@
 
     var progress = game.waveTimer / WAVE_DUR;
     var dc = DIFF[game.difficulty] || DIFF.normal;
-    game.spawnInterval = (2.5 - progress * 1.7) * dc.spawnMult;
+    game.spawnInterval = (2.6 - progress * 1.4) * dc.spawnMult;
     if (game.spawnInterval < 0.5) game.spawnInterval = 0.5;
 
     game.spawnTimer -= dt;
@@ -1196,7 +1203,7 @@
     var type = weightedRandom(pool);
     var def = ENEMY_DEFS[type];
 
-    var count = (type === 'mummy') ? 3 + Math.floor(Math.random() * 3) : 1;
+    var count = (type === 'mummy') ? 2 + Math.floor(Math.random() * 2) : 1;
     for (var n = 0; n < count; n++) {
       var edge = getEdgeTile(def.fly);
       if (!edge) continue;
@@ -1318,7 +1325,7 @@
   }
 
   function updateBossCowboy(b, dt) {
-    var speed = b.type === 1 ? 0.35 : 0.25;
+    var speed = b.type === 1 ? 0.5 : 0.35;
 
     if (b.state === 'hide') {
       b.x = 4; b.y = 0;
@@ -1340,7 +1347,7 @@
         if (b.type === 2) {
           setTimeout(function() { bossFireAtPlayer(b.x, b.y); }, 100);
         }
-        b.fireTimer = b.type === 1 ? 0.6 : 0.4;
+        b.fireTimer = b.type === 1 ? 0.85 : 0.56;
       }
       b.moveTimer -= dt;
       if (b.moveTimer <= 0) {
@@ -1449,12 +1456,21 @@
 
   function defeatBoss() {
     SFX.clear();
+    if (musicBoss) { musicBoss.pause(); musicBoss.currentTime = 0; }
+    currentMusic = null;
     playSFXFile('complete');
-    stopBossMusic();
     game.effects.push({ x: px(game.boss.x)+25, y: py(game.boss.y)+25, timer:0.6, maxT:0.6, clr:'255,200,50' });
     game.boss = null;
     game.enemies = [];
     game.bullets = [];
+    setTimeout(function() {
+      if (!musicMuted && musicNormal) {
+        currentMusic = musicNormal;
+        musicNormal.currentTime = 0;
+        musicNormal.volume = 0.25;
+        musicNormal.play().catch(function(){});
+      }
+    }, 2000);
     completeArea();
   }
 
@@ -1972,6 +1988,20 @@
     resetGame();
     updateTitleHiScore();
     updateMuteButtons();
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden && loopRunning && !game.paused && currentScreen === 'game') {
+        game.paused = true;
+        game.pauseSel = 0;
+        pauseMusic();
+      }
+    });
+    window.addEventListener('blur', function() {
+      if (loopRunning && !game.paused && currentScreen === 'game') {
+        game.paused = true;
+        game.pauseSel = 0;
+        pauseMusic();
+      }
+    });
     showScreen('title');
   }
 

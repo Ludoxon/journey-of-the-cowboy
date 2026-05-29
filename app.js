@@ -26,7 +26,7 @@
     ogre:      { hp: 3, mi: 2.1, fly: false, clr: '#8B6914', clr2: '#5C4510' },
     mushroom:  { hp: 2, mi: 0.85, fly: false, clr: '#FF4C3B', clr2: '#CC2222' },
     butterfly: { hp: 1, mi: 1.2, fly: true,  clr: '#DA70D6', clr2: '#9B30FF' },
-    mummy:     { hp: 6, mi: 4.0, fly: false, clr: '#DAA520', clr2: '#B8860B' },
+    mummy:     { hp: 6, mi: 5.5, fly: false, clr: '#DAA520', clr2: '#B8860B' },
     imp:       { hp: 3, mi: 0.85, fly: true,  clr: '#DC143C', clr2: '#8B0000' },
   };
 
@@ -1203,7 +1203,7 @@
     var type = weightedRandom(pool);
     var def = ENEMY_DEFS[type];
 
-    var count = (type === 'mummy') ? 2 + Math.floor(Math.random() * 2) : 1;
+    var count = (type === 'mummy') ? 1 + Math.floor(Math.random() * 2) : 1;
     for (var n = 0; n < count; n++) {
       var edge = getEdgeTile(def.fly);
       if (!edge) continue;
